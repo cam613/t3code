@@ -976,9 +976,13 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: SidebarThreadRowP
           : shouldRecede
             ? "text-sidebar-muted-foreground/75 hover:bg-sidebar-row-hover hover:text-sidebar-foreground"
             : "bg-transparent text-sidebar-foreground hover:bg-sidebar-row-hover",
-    shouldRecede &&
-      (status === "preparing" || status === "working") &&
-      "opacity-70 transition-opacity hover:opacity-100 focus-within:opacity-100 motion-reduce:transition-none",
+    (status === "preparing" || status === "working" || status === "waiting") &&
+      "bg-sidebar-row-working/20 text-sidebar-foreground hover:bg-sidebar-row-working/30",
+    status === "ready" &&
+      thread.latestRun?.status === "completed" &&
+      "bg-sidebar-row-done/20 text-sidebar-foreground hover:bg-sidebar-row-done/30",
+    (props.isActive || isSelected || props.sweepAction !== null) &&
+      "ring-1 ring-inset ring-primary/60",
     isFileDragOver && "ring-1 ring-inset ring-primary/70",
     isFileDragOver && !props.isActive && !isSelected && "bg-sidebar-row-hover",
     props.sortable?.isDragging &&
