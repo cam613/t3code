@@ -218,11 +218,13 @@ export function sidebarListItemId(item: SidebarListItem): string {
 }
 
 function sectionAtSidebarSlot(items: readonly SidebarListItem[], index: number): SidebarSection {
-  let section: SidebarSection = "pinned";
+  const firstMarker = items.find((item) => item.kind === "marker");
+  let section: SidebarSection = firstMarker?.marker === "working-header" ? "working" : "pinned";
   for (let i = 0; i < index && i < items.length; i += 1) {
     const item = items[i]!;
     if (item.kind !== "marker") continue;
-    if (item.marker === "pinned-divider") section = "active";
+    if (item.marker === "pinned-header") section = "pinned";
+    else if (item.marker === "pinned-divider") section = "active";
     else if (item.marker === "working-header") section = "working";
     else if (item.marker === "snoozed-header") section = "snoozed";
     else if (item.marker === "settled-header") section = "settled";
@@ -253,15 +255,12 @@ export function resolveSidebarDropTarget(
   let currentSection: SidebarSection = "pinned";
   for (const item of moved) {
     if (item.kind === "marker") {
-      if (item.marker === "pinned-divider") currentSection = "active";
-      else if (
-        item.marker === "working-header" ||
-        item.marker === "snoozed-header" ||
-        item.marker === "settled-header"
-      )
-        break;
+      if (item.marker === "pinned-header") currentSection = "pinned";
+      else if (item.marker === "pinned-divider") currentSection = "active";
+      else if (item.marker === "working-header") currentSection = "working";
+      else if (item.marker === "snoozed-header" || item.marker === "settled-header") break;
     } else if (currentSection === "pinned") pinnedOrder.push(item.key);
-    else activeOrder.push(item.key);
+    else if (currentSection === "active") activeOrder.push(item.key);
   }
   return { section, pinnedOrder, activeOrder };
 }
